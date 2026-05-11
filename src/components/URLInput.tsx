@@ -9,6 +9,7 @@ interface URLInputProps {
 export function URLInput({ onAdd }: URLInputProps) {
   const [value, setValue] = useState("");
   const [loading, setLoading] = useState(false);
+  const [pasteHint, setPasteHint] = useState<"success" | "error" | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = async (e: FormEvent) => {
@@ -21,18 +22,55 @@ export function URLInput({ onAdd }: URLInputProps) {
     inputRef.current?.focus();
   };
 
-  // 現在のタブのURLを取得（Chrome拡張なしではアクセス不可のため、
-  // clipboardからの貼り付けをサポート）
-  const handlePasteCurrentTab = async () => {
+  const handlePaste = async () => {
+    // ① まずinputにフォーカスしてからdocument.execCommand("paste")を試みる
+    //    これはiOS Safariで最も動作が安定している方法
+    const input = inputRef.current;
+    if (!input) return;
+
+    input.focus();
+
+    // ② Clipboard API が使えるブラウザ（Chrome / Firefox等）はこちら
+    if (navigator.clipboard && navigator.clipboard.readText) {
+      try {
+        const text = await navigator.clipboard.readText();
+        if (text) {
+          const normalized = /^https?:\/\//i.test(text) ? text : `https://${text}`;
+          setValue(normalized);
+          setPasteHint("success");
+          setTimeout(() => setPasteHint(null), 2000);
+          return;
+        }
+      } catch {
+        // 権限拒否などの場合は③へフォールバック
+      }
+    }
+
+    // ③ execCommand("paste") — iOS Safari / 古いブラウザ向け
+    //    input にフォーカスした状態で呼ぶとシステムの貼り付けダイアログが出る
     try {
-      const text = await navigator.clipboard.readText();
-      if (text && /^https?:\/\//i.test(text)) {
-        setValue(text);
-        inputRef.current?.focus();
+      const result = document.execCommand("paste");
+      if (result) {
+        // execCommandは同期的にinputのvalueを変えないため
+        // onInputイベント経由でvalueが更新されるのを待つ
+        setTimeout(() => {
+          const current = inputRef.current?.value ?? "";
+          if (current) {
+            setValue(current);
+            setPasteHint("success");
+            setTimeout(() => setPasteHint(null), 2000);
+          }
+        }, 100);
+        return;
       }
     } catch {
-      inputRef.current?.focus();
+      // 無視
     }
+
+    // ④ どちらも使えない場合 → inputを選択状態にしてユーザーに長押しペーストを促す
+    input.select();
+    setPasteHint("error");
+    setTimeout(() => setPasteHint(null), 3000);
   };
 
   return (
@@ -94,24 +132,47 @@ export function URLInput({ onAdd }: URLInputProps) {
         </button>
       </div>
 
-      {/* 現在のタブを追加ボタン */}
+      {/* 貼り付けボタン */}
       <button
         type="button"
-        onClick={handlePasteCurrentTab}
-        className="
+        onClick={handlePaste}
+        className={`
           w-full flex items-center justify-center gap-2
           py-2 rounded-xl text-xs font-medium
-          bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700/80
-          text-zinc-500 dark:text-zinc-400
-          border border-zinc-200/80 dark:border-zinc-700/50
-          transition-all duration-150
-        "
+          border transition-all duration-150
+          ${pasteHint === "success"
+            ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30"
+            : pasteHint === "error"
+            ? "bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-500/30"
+            : "bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700/80 text-zinc-500 dark:text-zinc-400 border-zinc-200/80 dark:border-zinc-700/50"
+          }
+        `}
       >
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-        </svg>
-        クリップボードのURLを貼り付け
+        {pasteHint === "success" ? (
+          <>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            貼り付けました
+          </>
+        ) : pasteHint === "error" ? (
+          <>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            入力欄を長押しして「ペースト」を選んでください
+          </>
+        ) : (
+          <>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            クリップボードのURLを貼り付け
+          </>
+        )}
       </button>
     </form>
   );
