@@ -21,8 +21,22 @@ export function URLInput({ onAdd }: URLInputProps) {
     inputRef.current?.focus();
   };
 
+  // 現在のタブのURLを取得（Chrome拡張なしではアクセス不可のため、
+  // clipboardからの貼り付けをサポート）
+  const handlePasteCurrentTab = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (text && /^https?:\/\//i.test(text)) {
+        setValue(text);
+        inputRef.current?.focus();
+      }
+    } catch {
+      inputRef.current?.focus();
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="w-full">
+    <form onSubmit={handleSubmit} className="w-full space-y-2">
       <div className="relative flex items-center gap-2">
         <div className="relative flex-1">
           <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500 pointer-events-none">
@@ -79,6 +93,26 @@ export function URLInput({ onAdd }: URLInputProps) {
           <span className="hidden sm:inline">追加</span>
         </button>
       </div>
+
+      {/* 現在のタブを追加ボタン */}
+      <button
+        type="button"
+        onClick={handlePasteCurrentTab}
+        className="
+          w-full flex items-center justify-center gap-2
+          py-2 rounded-xl text-xs font-medium
+          bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700/80
+          text-zinc-500 dark:text-zinc-400
+          border border-zinc-200/80 dark:border-zinc-700/50
+          transition-all duration-150
+        "
+      >
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+        </svg>
+        クリップボードのURLを貼り付け
+      </button>
     </form>
   );
 }

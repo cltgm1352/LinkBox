@@ -5,3 +5,5 @@ export interface LinkItem {
   favicon: string | null;
   createdAt: number;
 }
+
+export type ViewMode = "list" | "grid";

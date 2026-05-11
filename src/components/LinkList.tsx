@@ -1,16 +1,18 @@
 "use client";
 
-import { LinkItem } from "@/types/link";
+import { LinkItem, ViewMode } from "@/types/link";
 import { LinkCard } from "./LinkCard";
 
 interface LinkListProps {
   links: LinkItem[];
   onRemove: (id: string) => void;
+  onUpdate: (id: string, url: string) => Promise<void>;
   query: string;
   isLoaded: boolean;
+  viewMode: ViewMode;
 }
 
-export function LinkList({ links, onRemove, query, isLoaded }: LinkListProps) {
+export function LinkList({ links, onRemove, onUpdate, query, isLoaded, viewMode }: LinkListProps) {
   if (!isLoaded) {
     return (
       <div className="flex items-center justify-center py-16">
@@ -46,10 +48,20 @@ export function LinkList({ links, onRemove, query, isLoaded }: LinkListProps) {
     );
   }
 
+  if (viewMode === "grid") {
+    return (
+      <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+        {links.map((link) => (
+          <LinkCard key={link.id} link={link} onRemove={onRemove} onUpdate={onUpdate} viewMode="grid" />
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-2">
       {links.map((link) => (
-        <LinkCard key={link.id} link={link} onRemove={onRemove} />
+        <LinkCard key={link.id} link={link} onRemove={onRemove} onUpdate={onUpdate} viewMode="list" />
       ))}
     </div>
   );

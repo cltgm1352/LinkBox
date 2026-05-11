@@ -29,7 +29,6 @@ export function useLinks() {
 
     const id = crypto.randomUUID();
 
-    // Optimistically add with domain as title + google favicon immediately
     const optimistic: LinkItem = {
       id,
       url,
@@ -39,7 +38,6 @@ export function useLinks() {
     };
     setLinks((prev) => [optimistic, ...prev]);
 
-    // Fetch real metadata in background
     const meta = await fetchUrlMeta(url);
     setLinks((prev) =>
       prev.map((link) =>
@@ -58,5 +56,35 @@ export function useLinks() {
     setLinks((prev) => prev.filter((link) => link.id !== id));
   }, []);
 
-  return { links, addLink, removeLink, isLoaded };
+  const updateLink = useCallback(async (id: string, rawUrl: string): Promise<void> => {
+    let url = rawUrl.trim();
+    if (!url) return;
+    if (!/^https?:\/\//i.test(url)) {
+      url = "https://" + url;
+    }
+
+    // Optimistically update URL and reset meta
+    setLinks((prev) =>
+      prev.map((link) =>
+        link.id === id
+          ? { ...link, url, title: extractDomain(url), favicon: getFaviconUrl(url) }
+          : link
+      )
+    );
+
+    const meta = await fetchUrlMeta(url);
+    setLinks((prev) =>
+      prev.map((link) =>
+        link.id === id
+          ? {
+              ...link,
+              title: meta.title || extractDomain(url),
+              favicon: meta.favicon || getFaviconUrl(url),
+            }
+          : link
+      )
+    );
+  }, []);
+
+  return { links, addLink, removeLink, updateLink, isLoaded };
 }

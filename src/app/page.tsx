@@ -6,10 +6,12 @@ import { useLinks } from "@/hooks/useLinks";
 import { URLInput } from "@/components/URLInput";
 import { SearchBar } from "@/components/SearchBar";
 import { LinkList } from "@/components/LinkList";
+import { ViewMode } from "@/types/link";
 
 export default function Home() {
-  const { links, addLink, removeLink, isLoaded } = useLinks();
+  const { links, addLink, removeLink, updateLink, isLoaded } = useLinks();
   const [query, setQuery] = useState("");
+  const [viewMode, setViewMode] = useState<ViewMode>("list");
 
   const filtered = useMemo(() => {
     if (!query.trim()) return links;
@@ -23,7 +25,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 transition-colors duration-300">
-      {/* Subtle background texture */}
       <div className="fixed inset-0 pointer-events-none opacity-[0.03] dark:opacity-[0.05]"
         style={{
           backgroundImage: `radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)`,
@@ -41,7 +42,7 @@ export default function Home() {
               alt="LinkBox"
               width={28}
               height={28}
-              className="rounded-lg object-contain"
+              className="rounded-xl object-contain"
               priority
             />
             <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
@@ -49,7 +50,7 @@ export default function Home() {
             </h1>
           </div>
           <p className="text-xs text-zinc-400 dark:text-zinc-600 ml-9">
-            よく使うURLをすぐにアクセス
+            よく使うURLにすぐアクセス
           </p>
         </header>
 
@@ -58,14 +59,60 @@ export default function Home() {
           <URLInput onAdd={addLink} />
         </section>
 
-        {/* Search — only show when there are links */}
+        {/* Search + View toggle */}
         {isLoaded && links.length > 0 && (
-          <section className="mb-5">
-            <SearchBar
-              value={query}
-              onChange={setQuery}
-              count={filtered.length}
-            />
+          <section className="mb-5 flex items-center gap-2">
+            <div className="flex-1">
+              <SearchBar
+                value={query}
+                onChange={setQuery}
+                count={filtered.length}
+              />
+            </div>
+
+            {/* View mode toggle */}
+            <div className="flex items-center gap-1 p-1 rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700/50 shrink-0">
+              {/* List view */}
+              <button
+                onClick={() => setViewMode("list")}
+                aria-label="リスト表示"
+                className={`
+                  p-1.5 rounded-lg transition-all duration-150
+                  ${viewMode === "list"
+                    ? "bg-white dark:bg-zinc-700 text-indigo-500 shadow-sm"
+                    : "text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300"
+                  }
+                `}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="8" y1="6" x2="21" y2="6"/>
+                  <line x1="8" y1="12" x2="21" y2="12"/>
+                  <line x1="8" y1="18" x2="21" y2="18"/>
+                  <line x1="3" y1="6" x2="3.01" y2="6"/>
+                  <line x1="3" y1="12" x2="3.01" y2="12"/>
+                  <line x1="3" y1="18" x2="3.01" y2="18"/>
+                </svg>
+              </button>
+              {/* Grid view */}
+              <button
+                onClick={() => setViewMode("grid")}
+                aria-label="グリッド表示"
+                className={`
+                  p-1.5 rounded-lg transition-all duration-150
+                  ${viewMode === "grid"
+                    ? "bg-white dark:bg-zinc-700 text-indigo-500 shadow-sm"
+                    : "text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300"
+                  }
+                `}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="7" height="7"/>
+                  <rect x="14" y="3" width="7" height="7"/>
+                  <rect x="3" y="14" width="7" height="7"/>
+                  <rect x="14" y="14" width="7" height="7"/>
+                </svg>
+              </button>
+            </div>
           </section>
         )}
 
@@ -85,8 +132,10 @@ export default function Home() {
         <LinkList
           links={filtered}
           onRemove={removeLink}
+          onUpdate={updateLink}
           query={query}
           isLoaded={isLoaded}
+          viewMode={viewMode}
         />
       </div>
     </div>
