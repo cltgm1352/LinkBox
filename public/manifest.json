@@ -1,0 +1,16 @@
+{
+  "name": "LinkBox",
+  "short_name": "LinkBox",
+  "description": "よく使うURLを管理するリンクボックス",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#09090b",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

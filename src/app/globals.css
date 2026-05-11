@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Remove search input default styles */
+input[type="search"]::-webkit-search-cancel-button {
+  display: none;
+}
+
+/* Focus ring polish */
+:focus-visible {
+  outline: 2px solid rgb(99 102 241 / 0.6);
+  outline-offset: 2px;
+}
