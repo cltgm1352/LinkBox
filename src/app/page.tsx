@@ -50,7 +50,7 @@ export default function Home() {
             </h1>
           </div>
           <p className="text-xs text-zinc-400 dark:text-zinc-600 ml-9">
-            よく使うURLにすぐアクセス
+            よく使うサイトにすぐアクセス
           </p>
         </header>
 
