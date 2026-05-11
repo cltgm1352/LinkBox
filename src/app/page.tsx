@@ -38,7 +38,7 @@ export default function Home() {
         <header className="mb-8">
           <div className="flex items-center gap-2.5 mb-1">
             <Image
-              src="/img/logo.png"
+              src="icon.svg"
               alt="LinkBox"
               width={28}
               height={28}
