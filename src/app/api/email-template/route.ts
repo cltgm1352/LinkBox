@@ -1,10 +1,10 @@
-// このファイルはメールテンプレートのHTMLを返すAPIです
-// Supabase Dashboard > Authentication > Email Templates に貼り付けてください
 import { NextResponse } from "next/server";
 
 export async function GET() {
   const html = getConfirmEmailTemplate();
-  return new NextResponse(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
+  return new NextResponse(html, {
+    headers: { "Content-Type": "text/html; charset=utf-8" },
+  });
 }
 
 export function getConfirmEmailTemplate(): string {
@@ -12,58 +12,77 @@ export function getConfirmEmailTemplate(): string {
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>LinkBox メール確認</title>
 </head>
-<body style="margin:0;padding:0;background:#f4f4f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f5;padding:40px 16px;">
-    <tr><td align="center">
-      <table width="100%" style="max-width:480px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+<body style="margin:0;padding:0;background-color:#f4f4f5;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f4f5;">
+  <tr>
+    <td align="center" style="padding:40px 16px;">
 
-        <!-- Header -->
+      <!-- Card -->
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:480px;background-color:#ffffff;border-radius:16px;overflow:hidden;">
+
+        <!-- Header (bgcolor fallback for email clients) -->
         <tr>
-          <td style="background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 100%);padding:32px 40px;text-align:center;">
-            <div style="display:inline-flex;align-items:center;gap:10px;">
-              <div style="width:36px;height:36px;background:rgba(255,255,255,0.2);border-radius:10px;display:flex;align-items:center;justify-content:center;">
-                <span style="font-size:20px;">🔗</span>
-              </div>
-              <span style="font-size:22px;font-weight:700;color:#ffffff;letter-spacing:-0.5px;">LinkBox</span>
-            </div>
+          <td bgcolor="#6366f1" align="center" style="background-color:#6366f1;padding:32px 40px;">
+            <table cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td style="width:40px;height:40px;background-color:rgba(255,255,255,0.2);border-radius:10px;text-align:center;vertical-align:middle;font-size:22px;padding:6px;">
+                  &#128279;
+                </td>
+                <td style="padding-left:10px;">
+                  <span style="font-size:22px;font-weight:700;color:#ffffff;font-family:-apple-system,BlinkMacSystemFont,sans-serif;letter-spacing:-0.5px;">LinkBox</span>
+                </td>
+              </tr>
+            </table>
           </td>
         </tr>
 
         <!-- Body -->
         <tr>
-          <td style="padding:36px 40px;">
-            <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#18181b;letter-spacing:-0.5px;">メールアドレスの確認</h1>
-            <p style="margin:0 0 24px;font-size:14px;color:#71717a;line-height:1.6;">LinkBoxへのご登録ありがとうございます。<br>以下のボタンをクリックして登録を完了してください。</p>
+          <td style="padding:36px 40px 24px;">
+            <p style="margin:0 0 6px;font-size:22px;font-weight:700;color:#18181b;font-family:-apple-system,BlinkMacSystemFont,sans-serif;letter-spacing:-0.5px;">メールアドレスの確認</p>
+            <p style="margin:0 0 28px;font-size:14px;color:#71717a;line-height:1.7;font-family:-apple-system,BlinkMacSystemFont,sans-serif;">LinkBoxへのご登録ありがとうございます。<br>以下のボタンをクリックして登録を完了してください。</p>
 
-            <div style="text-align:center;margin:32px 0;">
-              <a href="{{ .ConfirmationURL }}" style="display:inline-block;padding:14px 36px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#ffffff;text-decoration:none;border-radius:12px;font-size:15px;font-weight:600;letter-spacing:0.2px;box-shadow:0 4px 12px rgba(99,102,241,0.4);">
-                メールアドレスを確認する
-              </a>
-            </div>
+            <!-- Button -->
+            <table cellpadding="0" cellspacing="0" border="0" width="100%">
+              <tr>
+                <td align="center" style="padding:4px 0 32px;">
+                  <a href="{{ .ConfirmationURL }}"
+                    style="display:inline-block;padding:14px 40px;background-color:#6366f1;color:#ffffff;text-decoration:none;border-radius:12px;font-size:15px;font-weight:600;font-family:-apple-system,BlinkMacSystemFont,sans-serif;letter-spacing:0.2px;">
+                    メールアドレスを確認する
+                  </a>
+                </td>
+              </tr>
+            </table>
 
-            <p style="margin:0 0 8px;font-size:12px;color:#a1a1aa;text-align:center;">ボタンが機能しない場合は以下のURLをコピーしてください</p>
-            <p style="margin:0;font-size:11px;color:#a1a1aa;text-align:center;word-break:break-all;background:#f4f4f5;padding:10px;border-radius:8px;">{{ .ConfirmationURL }}</p>
+            <!-- Divider -->
+            <table cellpadding="0" cellspacing="0" border="0" width="100%">
+              <tr><td style="height:1px;background-color:#f4f4f5;font-size:0;line-height:0;">&nbsp;</td></tr>
+            </table>
+
+            <!-- Fallback URL -->
+            <p style="margin:20px 0 6px;font-size:12px;color:#a1a1aa;text-align:center;font-family:-apple-system,BlinkMacSystemFont,sans-serif;">ボタンが機能しない場合は以下のURLをコピーしてください</p>
+            <p style="margin:0;font-size:11px;color:#a1a1aa;text-align:center;word-break:break-all;background-color:#f4f4f5;padding:12px;border-radius:8px;font-family:monospace;">{{ .ConfirmationURL }}</p>
           </td>
         </tr>
 
-        <!-- Divider -->
-        <tr><td style="padding:0 40px;"><div style="height:1px;background:#f4f4f5;"></div></td></tr>
-
         <!-- Footer -->
         <tr>
-          <td style="padding:24px 40px;text-align:center;">
-            <p style="margin:0 0 4px;font-size:12px;color:#a1a1aa;">このメールに身に覚えがない場合は無視してください。</p>
-            <p style="margin:0;font-size:12px;color:#a1a1aa;">リンクは24時間有効です。</p>
-            <p style="margin:16px 0 0;font-size:11px;color:#d4d4d8;">&copy; 2025 LinkBox. All rights reserved.</p>
+          <td align="center" style="padding:20px 40px 32px;">
+            <p style="margin:0 0 4px;font-size:12px;color:#a1a1aa;font-family:-apple-system,BlinkMacSystemFont,sans-serif;">このメールに身に覚えがない場合は無視してください。</p>
+            <p style="margin:0 0 12px;font-size:12px;color:#a1a1aa;font-family:-apple-system,BlinkMacSystemFont,sans-serif;">リンクは24時間有効です。</p>
+            <p style="margin:0;font-size:11px;color:#d4d4d8;font-family:-apple-system,BlinkMacSystemFont,sans-serif;">&copy; 2025 LinkBox. All rights reserved.</p>
           </td>
         </tr>
 
       </table>
-    </td></tr>
-  </table>
+      <!-- /Card -->
+
+    </td>
+  </tr>
+</table>
 </body>
 </html>`;
 }
