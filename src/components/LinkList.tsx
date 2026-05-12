@@ -1,18 +1,20 @@
 "use client";
 
-import { LinkItem, ViewMode } from "@/types/link";
+import { LinkItem, Category, ViewMode } from "@/types/link";
 import { LinkCard } from "./LinkCard";
 
 interface LinkListProps {
   links: LinkItem[];
+  categories: Category[];
   onRemove: (id: string) => void;
-  onUpdate: (id: string, url: string) => Promise<void>;
+  onEdit: (link: LinkItem) => void;
+  onToggleBookmark: (id: string) => void;
   query: string;
   isLoaded: boolean;
   viewMode: ViewMode;
 }
 
-export function LinkList({ links, onRemove, onUpdate, query, isLoaded, viewMode }: LinkListProps) {
+export function LinkList({ links, categories, onRemove, onEdit, onToggleBookmark, query, isLoaded, viewMode }: LinkListProps) {
   if (!isLoaded) {
     return (
       <div className="flex items-center justify-center py-16">
@@ -40,29 +42,25 @@ export function LinkList({ links, onRemove, onUpdate, query, isLoaded, viewMode 
 
   if (links.length === 0 && query) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 gap-2">
-        <p className="text-sm text-zinc-400 dark:text-zinc-500">
-          &ldquo;{query}&rdquo; に一致するリンクが見つかりません
-        </p>
+      <div className="flex flex-col items-center justify-center py-16">
+        <p className="text-sm text-zinc-400 dark:text-zinc-500">&ldquo;{query}&rdquo; に一致するリンクが見つかりません</p>
       </div>
     );
   }
 
+  const cardProps = { categories, onRemove, onEdit, onToggleBookmark, viewMode };
+
   if (viewMode === "grid") {
     return (
       <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
-        {links.map((link) => (
-          <LinkCard key={link.id} link={link} onRemove={onRemove} onUpdate={onUpdate} viewMode="grid" />
-        ))}
+        {links.map((link) => <LinkCard key={link.id} link={link} {...cardProps} />)}
       </div>
     );
   }
 
   return (
     <div className="flex flex-col gap-2">
-      {links.map((link) => (
-        <LinkCard key={link.id} link={link} onRemove={onRemove} onUpdate={onUpdate} viewMode="list" />
-      ))}
+      {links.map((link) => <LinkCard key={link.id} link={link} {...cardProps} />)}
     </div>
   );
 }
