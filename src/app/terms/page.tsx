@@ -11,7 +11,7 @@ export default function TermsPage() {
             <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors">LinkBox</span>
           </Link>
           <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50 mb-1">利用規約</h1>
-          <p className="text-sm text-zinc-400">最終更新日：2025年1月1日</p>
+          <p className="text-sm text-zinc-400">最終更新日：2026年5月13日</p>
         </div>
 
         <div className="prose prose-zinc dark:prose-invert max-w-none space-y-8 text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed">
