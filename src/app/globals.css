@@ -1,21 +1,32 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* Smooth scroll */
 html {
   scroll-behavior: smooth;
 }
 
-/* Remove search input default styles */
+/* iOSのinput自動ズームを防ぐ — font-size を常に16px以上に */
+input,
+textarea,
+select {
+  font-size: 16px !important;
+}
+
+/* search inputのキャンセルボタンを非表示 */
 input[type="search"]::-webkit-search-cancel-button {
   display: none;
 }
 
-/* Focus ring polish */
+/* フォーカスリング */
 :focus-visible {
   outline: 2px solid rgb(99 102 241 / 0.6);
   outline-offset: 2px;
+}
+
+/* フィルタータブの横スクロールバー非表示 */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }

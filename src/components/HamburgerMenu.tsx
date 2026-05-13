@@ -6,39 +6,28 @@ import { useAuth } from "@/context/AuthContext";
 interface HamburgerMenuProps {
   onLoginClick: () => void;
   onRegisterClick: () => void;
+  onDataClick: () => void;
 }
 
-export function HamburgerMenu({ onLoginClick, onRegisterClick }: HamburgerMenuProps) {
+export function HamburgerMenu({ onLoginClick, onRegisterClick, onDataClick }: HamburgerMenuProps) {
   const [open, setOpen] = useState(false);
   const { user, signOut } = useAuth();
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
+    const fn = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setOpen(false);
     };
-    if (open) document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
+    if (open) document.addEventListener("mousedown", fn);
+    return () => document.removeEventListener("mousedown", fn);
   }, [open]);
-
-  const handleSignOut = async () => {
-    await signOut();
-    setOpen(false);
-  };
 
   return (
     <div ref={menuRef} className="relative">
       <button
         onClick={() => setOpen(!open)}
         aria-label="メニュー"
-        className="
-          w-8 h-8 rounded-xl flex flex-col items-center justify-center gap-1.5
-          text-zinc-500 dark:text-zinc-400
-          hover:bg-zinc-100 dark:hover:bg-zinc-800
-          transition-all duration-150
-        "
+        className="w-8 h-8 rounded-xl flex flex-col items-center justify-center gap-1.5 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all duration-150"
       >
         <span className={`block w-4 h-0.5 bg-current rounded-full transition-all duration-200 ${open ? "translate-y-2 rotate-45" : ""}`} />
         <span className={`block w-4 h-0.5 bg-current rounded-full transition-all duration-200 ${open ? "opacity-0" : ""}`} />
@@ -46,17 +35,9 @@ export function HamburgerMenu({ onLoginClick, onRegisterClick }: HamburgerMenuPr
       </button>
 
       {open && (
-        <div className="
-          absolute right-0 top-10 w-56 z-40
-          bg-white dark:bg-zinc-900
-          border border-zinc-200 dark:border-zinc-800
-          rounded-2xl shadow-xl shadow-black/10 dark:shadow-black/30
-          overflow-hidden
-          animate-in fade-in slide-in-from-top-2 duration-150
-        ">
+        <div className="absolute right-0 top-10 w-56 z-40 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-xl shadow-black/10 dark:shadow-black/30 overflow-hidden">
           {user ? (
             <>
-              {/* User info */}
               <div className="px-4 py-3 border-b border-zinc-100 dark:border-zinc-800">
                 <p className="text-xs font-medium text-zinc-900 dark:text-zinc-100 truncate">{user.email}</p>
                 <div className="flex items-center gap-1.5 mt-1">
@@ -64,14 +45,21 @@ export function HamburgerMenu({ onLoginClick, onRegisterClick }: HamburgerMenuPr
                   <p className="text-xs text-zinc-400">無制限プラン</p>
                 </div>
               </div>
-              <div className="p-2">
+              <div className="p-2 space-y-0.5">
                 <button
-                  onClick={handleSignOut}
-                  className="
-                    w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm
-                    text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10
-                    transition-colors duration-150
-                  "
+                  onClick={() => { onDataClick(); setOpen(false); }}
+                  className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                  </svg>
+                  データ管理（CSV）
+                </button>
+                <button
+                  onClick={() => { signOut(); setOpen(false); }}
+                  className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
@@ -89,12 +77,19 @@ export function HamburgerMenu({ onLoginClick, onRegisterClick }: HamburgerMenuPr
               </div>
               <div className="p-2 space-y-1">
                 <button
+                  onClick={() => { onDataClick(); setOpen(false); }}
+                  className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                  </svg>
+                  データ管理（CSV）
+                </button>
+                <button
                   onClick={() => { onLoginClick(); setOpen(false); }}
-                  className="
-                    w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium
-                    text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800
-                    transition-colors duration-150
-                  "
+                  className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
@@ -105,11 +100,7 @@ export function HamburgerMenu({ onLoginClick, onRegisterClick }: HamburgerMenuPr
                 </button>
                 <button
                   onClick={() => { onRegisterClick(); setOpen(false); }}
-                  className="
-                    w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium
-                    bg-indigo-500 hover:bg-indigo-600 text-white
-                    transition-colors duration-150
-                  "
+                  className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium bg-indigo-500 hover:bg-indigo-600 text-white transition-colors"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>

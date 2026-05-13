@@ -12,15 +12,16 @@ import { AuthModal } from "@/components/AuthModal";
 import { LimitBanner, FREE_LIMIT_CONST } from "@/components/LimitBanner";
 import { EditLinkModal } from "@/components/EditLinkModal";
 import { CategoryModal } from "@/components/CategoryModal";
+import { DataModal } from "@/components/DataModal";
 import { LinkItem, ViewMode, CATEGORY_COLORS } from "@/types/link";
 
-type FilterMode = "all" | "bookmarked" | string; // string = categoryId
+type FilterMode = "all" | "bookmarked" | string;
 
 export default function Home() {
   const {
     links, categories, isLoaded,
     addLink, removeLink, updateLink, toggleBookmark, setLinkCategory,
-    addCategory, updateCategory, removeCategory,
+    addCategory, updateCategory, removeCategory, importLinks,
   } = useLinks();
 
   const { user, isLoading: authLoading } = useAuth();
@@ -30,6 +31,7 @@ export default function Home() {
   const [authModal, setAuthModal] = useState<{ open: boolean; mode: "login" | "register" }>({ open: false, mode: "login" });
   const [editingLink, setEditingLink] = useState<LinkItem | null>(null);
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
+  const [dataModalOpen, setDataModalOpen] = useState(false);
 
   const isAtLimit = !user && links.length >= FREE_LIMIT_CONST;
 
@@ -72,6 +74,7 @@ export default function Home() {
               <HamburgerMenu
                 onLoginClick={() => setAuthModal({ open: true, mode: "login" })}
                 onRegisterClick={() => setAuthModal({ open: true, mode: "register" })}
+                onDataClick={() => setDataModalOpen(true)}
               />
             )}
           </div>
@@ -99,65 +102,47 @@ export default function Home() {
         {/* Filter tabs */}
         {isLoaded && links.length > 0 && (
           <section className="mb-4">
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
-              {/* All */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
               <button
                 onClick={() => setFilterMode("all")}
                 className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
-                  filterMode === "all"
-                    ? "bg-indigo-500 text-white border-indigo-500"
-                    : "bg-white dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:border-zinc-300"
+                  filterMode === "all" ? "bg-indigo-500 text-white border-indigo-500" : "bg-white dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:border-zinc-300"
                 }`}
               >
                 すべて
-                <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${filterMode === "all" ? "bg-white/20 text-white" : "bg-zinc-100 dark:bg-zinc-700 text-zinc-400"}`}>
-                  {links.length}
-                </span>
+                <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${filterMode === "all" ? "bg-white/20" : "bg-zinc-100 dark:bg-zinc-700 text-zinc-400"}`}>{links.length}</span>
               </button>
 
-              {/* Bookmarked */}
               {bookmarkedCount > 0 && (
                 <button
                   onClick={() => setFilterMode("bookmarked")}
                   className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
-                    filterMode === "bookmarked"
-                      ? "bg-amber-400 text-white border-amber-400"
-                      : "bg-white dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:border-zinc-300"
+                    filterMode === "bookmarked" ? "bg-amber-400 text-white border-amber-400" : "bg-white dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:border-zinc-300"
                   }`}
                 >
                   <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
                   ブックマーク
-                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${filterMode === "bookmarked" ? "bg-white/20 text-white" : "bg-zinc-100 dark:bg-zinc-700 text-zinc-400"}`}>
-                    {bookmarkedCount}
-                  </span>
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${filterMode === "bookmarked" ? "bg-white/20" : "bg-zinc-100 dark:bg-zinc-700 text-zinc-400"}`}>{bookmarkedCount}</span>
                 </button>
               )}
 
-              {/* Category filters */}
               {categories.map((cat) => {
                 const col = CATEGORY_COLORS.find((c) => c.key === cat.color) ?? CATEGORY_COLORS[0];
                 const count = links.filter((l) => l.categoryId === cat.id).length;
                 const active = filterMode === cat.id;
                 return (
-                  <button
-                    key={cat.id}
-                    onClick={() => setFilterMode(cat.id)}
+                  <button key={cat.id} onClick={() => setFilterMode(cat.id)}
                     className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
                       active ? `${col.bg} ${col.text} ${col.border}` : "bg-white dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:border-zinc-300"
                     }`}
                   >
-                    <span>{cat.icon}</span>
-                    {cat.name}
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${active ? "bg-black/10 dark:bg-black/20" : "bg-zinc-100 dark:bg-zinc-700 text-zinc-400"}`}>
-                      {count}
-                    </span>
+                    <span>{cat.icon}</span>{cat.name}
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${active ? "bg-black/10 dark:bg-black/20" : "bg-zinc-100 dark:bg-zinc-700 text-zinc-400"}`}>{count}</span>
                   </button>
                 );
               })}
 
-              {/* Manage categories button */}
-              <button
-                onClick={() => setCategoryModalOpen(true)}
+              <button onClick={() => setCategoryModalOpen(true)}
                 className="shrink-0 flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs border transition-all bg-white dark:bg-zinc-800 text-zinc-400 border-zinc-200 dark:border-zinc-700 border-dashed hover:border-zinc-400 hover:text-zinc-600"
               >
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -203,37 +188,26 @@ export default function Home() {
           </div>
         )}
 
-        {/* Link list */}
         <LinkList
           links={filtered} categories={categories}
-          onRemove={removeLink}
-          onEdit={setEditingLink}
+          onRemove={removeLink} onEdit={setEditingLink}
           onToggleBookmark={toggleBookmark}
           query={query} isLoaded={isLoaded} viewMode={viewMode}
         />
+
+        {/* Footer links */}
+        <footer className="mt-16 flex items-center justify-center gap-4">
+          <a href="/terms" target="_blank" className="text-xs text-zinc-400 hover:text-zinc-600 dark:text-zinc-600 dark:hover:text-zinc-400 transition-colors">利用規約</a>
+          <span className="text-zinc-300 dark:text-zinc-700">·</span>
+          <a href="/privacy" target="_blank" className="text-xs text-zinc-400 hover:text-zinc-600 dark:text-zinc-600 dark:hover:text-zinc-400 transition-colors">プライバシーポリシー</a>
+        </footer>
       </div>
 
       {/* Modals */}
-      <AuthModal
-        isOpen={authModal.open}
-        onClose={() => setAuthModal((p) => ({ ...p, open: false }))}
-        defaultMode={authModal.mode}
-      />
-      <EditLinkModal
-        link={editingLink}
-        categories={categories}
-        onClose={() => setEditingLink(null)}
-        onSave={updateLink}
-        onSetCategory={setLinkCategory}
-      />
-      <CategoryModal
-        isOpen={categoryModalOpen}
-        onClose={() => setCategoryModalOpen(false)}
-        categories={categories}
-        onAdd={addCategory}
-        onUpdate={updateCategory}
-        onRemove={removeCategory}
-      />
+      <AuthModal isOpen={authModal.open} onClose={() => setAuthModal((p) => ({ ...p, open: false }))} defaultMode={authModal.mode} />
+      <EditLinkModal link={editingLink} categories={categories} onClose={() => setEditingLink(null)} onSave={updateLink} onSetCategory={setLinkCategory} />
+      <CategoryModal isOpen={categoryModalOpen} onClose={() => setCategoryModalOpen(false)} categories={categories} onAdd={addCategory} onUpdate={updateCategory} onRemove={removeCategory} />
+      <DataModal isOpen={dataModalOpen} onClose={() => setDataModalOpen(false)} links={links} categories={categories} onImport={importLinks} />
     </div>
   );
 }

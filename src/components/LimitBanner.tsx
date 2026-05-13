@@ -1,6 +1,6 @@
 "use client";
 
-const FREE_LIMIT = 20;
+const FREE_LIMIT = 50;
 
 interface LimitBannerProps {
   count: number;

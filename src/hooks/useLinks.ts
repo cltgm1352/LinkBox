@@ -81,9 +81,41 @@ export function useLinks() {
     setLinks((prev) => prev.map((l) => l.categoryId === id ? { ...l, categoryId: null } : l));
   }, []);
 
+  const importLinks = useCallback((
+    incoming: Omit<LinkItem, "id" | "createdAt">[],
+    newCategoryNames: string[]
+  ) => {
+    // Create new categories
+    const newCats: Category[] = newCategoryNames.map((name) => ({
+      id: crypto.randomUUID(),
+      name,
+      icon: "📁",
+      color: "indigo",
+      createdAt: Date.now(),
+    }));
+    if (newCats.length > 0) {
+      setCategories((prev) => [...prev, ...newCats]);
+    }
+
+    // Build a name→id map for new cats
+    const nameToId = Object.fromEntries(newCats.map((c) => [c.name, c.id]));
+
+    const newLinks: LinkItem[] = incoming.map((l) => {
+      let categoryId = l.categoryId ?? null;
+      if (categoryId?.startsWith("__import__")) {
+        const name = categoryId.replace("__import__", "");
+        categoryId = nameToId[name] ?? null;
+      }
+      return { ...l, id: crypto.randomUUID(), createdAt: Date.now(), categoryId };
+    });
+
+    setLinks((prev) => [...newLinks, ...prev]);
+  }, []);
+
+
   return {
     links, categories, isLoaded,
     addLink, removeLink, updateLink, toggleBookmark, setLinkCategory,
-    addCategory, updateCategory, removeCategory,
+    addCategory, updateCategory, removeCategory, importLinks,
   };
 }
