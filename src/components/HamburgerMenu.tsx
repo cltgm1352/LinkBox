@@ -27,11 +27,16 @@ export function HamburgerMenu({ onLoginClick, onRegisterClick, onDataClick }: Ha
       <button
         onClick={() => setOpen(!open)}
         aria-label="メニュー"
-        className="w-8 h-8 rounded-xl flex flex-col items-center justify-center gap-1.5 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all duration-150"
+        className={`w-8 h-8 rounded-xl flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all duration-150 ${open ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200" : ""}`}
       >
-        <span className={`block w-4 h-0.5 bg-current rounded-full transition-all duration-200 ${open ? "translate-y-2 rotate-45" : ""}`} />
-        <span className={`block w-4 h-0.5 bg-current rounded-full transition-all duration-200 ${open ? "opacity-0" : ""}`} />
-        <span className={`block w-4 h-0.5 bg-current rounded-full transition-all duration-200 ${open ? "-translate-y-2 -rotate-45" : ""}`} />
+        <svg
+          width="18" height="18" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+          className={`transition-transform duration-200 ${open ? "rotate-45" : ""}`}
+        >
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
       </button>
 
       {open && (

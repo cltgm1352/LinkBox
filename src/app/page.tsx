@@ -48,6 +48,14 @@ export default function Home() {
       const q = query.toLowerCase();
       result = result.filter((l) => l.title.toLowerCase().includes(q) || l.url.toLowerCase().includes(q));
     }
+    // ブックマークを先頭に並べる（bookmarkedフィルター時以外）
+    if (filterMode !== "bookmarked") {
+      result.sort((a, b) => {
+        if (a.bookmarked && !b.bookmarked) return -1;
+        if (!a.bookmarked && b.bookmarked) return 1;
+        return b.createdAt - a.createdAt;
+      });
+    }
     return result;
   }, [links, query, filterMode]);
 
