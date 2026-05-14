@@ -14,6 +14,7 @@ import { EditLinkModal } from "@/components/EditLinkModal";
 import { CategoryModal } from "@/components/CategoryModal";
 import { DataModal } from "@/components/DataModal";
 import { LinkItem, ViewMode, CATEGORY_COLORS } from "@/types/link";
+import { AdBanner } from "@/components/AdBanner";
 
 type FilterMode = "all" | "bookmarked" | string;
 
@@ -76,7 +77,7 @@ export default function Home() {
                 <Image src="/icon.svg" alt="LinkBox" width={28} height={28} className="rounded-xl object-contain" priority />
                 <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">LinkBox</h1>
               </div>
-              <p className="text-xs text-zinc-400 dark:text-zinc-600 ml-9">よく使うURLにすぐアクセス</p>
+              <p className="text-xs text-zinc-400 dark:text-zinc-600 ml-9">よく使うサイトにすぐアクセス</p>
             </div>
             {!authLoading && (
               <HamburgerMenu
@@ -106,6 +107,9 @@ export default function Home() {
         <section className="mb-4">
           <URLInput onAdd={handleAddLink} disabled={isAtLimit} />
         </section>
+
+        {/* Ad banner — 未ログイン時のみ表示 */}
+        {!user && isLoaded && <AdBanner />}
 
         {/* Filter tabs */}
         {isLoaded && links.length > 0 && (
