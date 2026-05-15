@@ -34,6 +34,12 @@ export default function Home() {
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
   const [dataModalOpen, setDataModalOpen] = useState(false);
 
+  // カテゴリー削除時、そのカテゴリーを表示中なら「すべて」に戻す
+  const handleRemoveCategory = (id: string) => {
+    if (filterMode === id) setFilterMode("all");
+    removeCategory(id);
+  };
+
   const isAtLimit = !user && links.length >= FREE_LIMIT_CONST;
 
   const handleAddLink = async (url: string) => {
@@ -218,7 +224,7 @@ export default function Home() {
       {/* Modals */}
       <AuthModal isOpen={authModal.open} onClose={() => setAuthModal((p) => ({ ...p, open: false }))} defaultMode={authModal.mode} />
       <EditLinkModal link={editingLink} categories={categories} onClose={() => setEditingLink(null)} onSave={updateLink} onSetCategory={setLinkCategory} />
-      <CategoryModal isOpen={categoryModalOpen} onClose={() => setCategoryModalOpen(false)} categories={categories} onAdd={addCategory} onUpdate={updateCategory} onRemove={removeCategory} />
+      <CategoryModal isOpen={categoryModalOpen} onClose={() => setCategoryModalOpen(false)} categories={categories} onAdd={addCategory} onUpdate={updateCategory} onRemove={handleRemoveCategory} />
       <DataModal isOpen={dataModalOpen} onClose={() => setDataModalOpen(false)} links={links} categories={categories} onImport={importLinks} />
     </div>
   );
